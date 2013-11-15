@@ -21,8 +21,8 @@ class Interval(object):
         return str((self.title, self.start, self.finish, self.weight))
 
 
-def calculate_previous_intervals(I):
-    '''For every interval j, calculate the rightmost mutually compatible interval i, where i < j
+def compute_previous_intervals(I):
+    '''For every interval j, compute the rightmost mutually compatible interval i, where i < j
        I is a sorted list of Interval objects (sorted by finish time)
     '''
     # extract start and finish times
@@ -46,7 +46,7 @@ def schedule_weighted_intervals(I):
     '''
 
     I.sort(lambda x, y: x.finish - y.finish)  # f_1 <= f_2 <= .. <= f_n
-    p = calculate_previous_intervals(I)
+    p = compute_previous_intervals(I)
 
     # compute OPTs iteratively in O(n), here we use DP
     OPT = collections.defaultdict(int)
@@ -55,16 +55,16 @@ def schedule_weighted_intervals(I):
     for j in xrange(1, len(I)):
         OPT[j] = max(I[j].weight + OPT[p[j]], OPT[j - 1])
 
-    # find actual solution intervals in O(n)
+    # given OPT and p, find actual solution intervals in O(n)
     O = []
-    def calculate_solution(j):
+    def compute_solution(j):
         if j >= 0:  # will halt on OPT[-1]
             if I[j].weight + OPT[p[j]] > OPT[j - 1]:
                 O.append(I[j])
-                calculate_solution(p[j])
+                compute_solution(p[j])
             else:
-                calculate_solution(j - 1)
-    calculate_solution(len(I) - 1)
+                compute_solution(j - 1)
+    compute_solution(len(I) - 1)
 
     # resort, as our O is in reverse order (OPTIONAL)
     O.sort(lambda x, y: x.finish - y.finish)
