@@ -1,3 +1,4 @@
+import collections
 import bisect
 import time
 from datetime import datetime
@@ -19,6 +20,7 @@ class Interval(object):
     def __repr__(self):
         return str((self.title, self.start, self.finish, self.weight))
 
+
 def calculate_previous_intervals(I):
     '''For every interval j, calculate the rightmost mutually compatible interval i, where i < j
        I is a sorted list of Interval objects (sorted by finish time)
@@ -29,13 +31,10 @@ def calculate_previous_intervals(I):
 
     p = []
     for j in xrange(len(I)):
-        i = bisect.bisect_right(finish, start[j])  # rightmost interval f_i <= s_j
-        if i:
-            i -= 1  # ofset index
+        i = bisect.bisect_right(finish, start[j]) - 1  # rightmost interval f_i <= s_j
         p.append(i)
 
     return p
-
 
 def schedule_weighted_intervals(I):
     '''Use dynamic algorithm to schedule weighted intervals
@@ -49,10 +48,26 @@ def schedule_weighted_intervals(I):
     I.sort(lambda x, y: x.finish - y.finish)  # f_1 <= f_2 <= .. <= f_n
     p = calculate_previous_intervals(I)
 
+    # compute OPTs iteratively in O(n), here we use DP
+    OPT = collections.defaultdict(int)
+    OPT[-1] = 0
+    OPT[0] = 0
+    for j in xrange(1, len(I)):
+        OPT[j] = max(I[j].weight + OPT[p[j]], OPT[j - 1])
+
+    # find actual solution intervals in O(n)
     O = []
-    finish = 0
-    for i in I:
-        print i
+    def calculate_solution(j):
+        if j >= 0:  # will halt on OPT[-1]
+            if I[j].weight + OPT[p[j]] > OPT[j - 1]:
+                O.append(I[j])
+                calculate_solution(p[j])
+            else:
+                calculate_solution(j - 1)
+    calculate_solution(len(I) - 1)
+
+    # resort, as our O is in reverse order (OPTIONAL)
+    O.sort(lambda x, y: x.finish - y.finish)
 
     return O
 
@@ -65,4 +80,4 @@ if __name__ == '__main__':
     I.append(Interval("Trimester 2" , "22 May, 13", "24 Jul, 13"))
     I.append(Interval("Trimester 3" , "28 Aug, 13", "16 Nov, 13"))
     O = schedule_weighted_intervals(I)
-
+    print O
