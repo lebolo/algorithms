@@ -51,8 +51,7 @@ def schedule_weighted_intervals(I):
     # compute OPTs iteratively in O(n), here we use DP
     OPT = collections.defaultdict(int)
     OPT[-1] = 0
-    OPT[0] = 0
-    for j in xrange(1, len(I)):
+    for j in xrange(len(I)):
         OPT[j] = max(I[j].weight + OPT[p[j]], OPT[j - 1])
 
     # given OPT and p, find actual solution intervals in O(n)
@@ -73,11 +72,14 @@ def schedule_weighted_intervals(I):
 
 if __name__ == '__main__':
     I = []
-    I.append(Interval("Summer School" , "14 Jan, 13", "24 Feb, 13"))
-    I.append(Interval("Semester 1" , "1 Mar, 13", "4 Jun, 13"))
-    I.append(Interval("Semester 2" , "18 Aug, 13", "24 Nov, 13"))
-    I.append(Interval("Trimester 1" , "22 Mar, 13", "16 May, 13"))
-    I.append(Interval("Trimester 2" , "22 May, 13", "24 Jul, 13"))
-    I.append(Interval("Trimester 3" , "28 Aug, 13", "16 Nov, 13"))
+    # I.append(Interval("Summer School" , "14 Jan, 13", "24 Feb, 13"))
+    # I.append(Interval("Semester 1" , "1 Mar, 13", "4 Jun, 13"))
+    # I.append(Interval("Semester 2" , "18 Aug, 13", "24 Nov, 13"))
+    # I.append(Interval("Trimester 1" , "22 Mar, 13", "16 May, 13"))
+    # I.append(Interval("Trimester 2" , "22 May, 13", "24 Jul, 13"))
+    # I.append(Interval("Trimester 3" , "28 Aug, 13", "16 Nov, 13"))
+    I.append(Interval("Test 0" , "01 Jan, 14", "13 Feb, 14"))
+    I.append(Interval("Test 1" , "01 Jan, 14", "24 Mar, 14"))
+    I.append(Interval("Test 2" , "7 Mar, 14", "20 Apr, 14"))
     O = schedule_weighted_intervals(I)
     print O
